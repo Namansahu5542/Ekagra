@@ -4,7 +4,7 @@ import { useSession } from "@/lib/session";
 import { colors } from "@/theme";
 
 export default function Index() {
-  const { ready, device, unlocked } = useSession();
+  const { ready, device, caregiver, unlocked } = useSession();
   if (!ready) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: colors.warmCanvas }}>
@@ -12,7 +12,7 @@ export default function Index() {
       </View>
     );
   }
-  if (!device) return <Redirect href="/setup" />;
-  if (!unlocked) return <Redirect href="/lock" />;
-  return <Redirect href="/home" />;
+  if (device) return <Redirect href={unlocked ? "/home" : "/lock"} />;
+  if (caregiver) return <Redirect href="/patient-setup" />;
+  return <Redirect href="/auth" />;
 }

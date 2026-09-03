@@ -37,6 +37,14 @@ export const api = {
       headers: { Authorization: `Bearer ${token}` },
       body: JSON.stringify(profile),
     }),
+  listMyPatients: (token: string) =>
+    request("/patient-profile/mine", {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+  getProfileAsCaregiver: (token: string, patientId: string) =>
+    request(`/patient-profile/${patientId}/as-caregiver`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
   verifyPin: (patientId: string, pin: string) =>
     request("/auth/patient/verify-pin", {
       method: "POST",

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { LayoutChangeEvent, Pressable, StyleSheet, View } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { AppText, BigButton, Card, Header, Screen } from "@/components/UI";
+import { AdaptiveGame } from "@/components/AdaptiveGame";
 import { GameResult } from "@/components/GameResult";
 import { useSession } from "@/lib/session";
 import { recordSession } from "@/games/engine";
@@ -21,11 +22,13 @@ interface Ball {
 }
 
 export default function WhackScreen() {
+  return <AdaptiveGame gameId="whack_the_ball" render={(lv) => <WhackGame level={lv} />} />;
+}
+
+function WhackGame({ level }: { level: number }) {
   const { t } = useTranslation();
   const router = useRouter();
   const { device, syncNow } = useSession();
-  const params = useLocalSearchParams<{ level?: string }>();
-  const level = Math.min(4, Math.max(1, parseInt(params.level || "2", 10)));
   const cfg = configForLevel(level);
 
   const [phase, setPhase] = useState<"ready" | "playing" | "done">("ready");

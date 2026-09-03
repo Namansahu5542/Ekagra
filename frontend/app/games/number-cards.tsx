@@ -1,8 +1,9 @@
 import { useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { AppText, BigButton, Card, Header, Screen } from "@/components/UI";
+import { AdaptiveGame } from "@/components/AdaptiveGame";
 import { GameResult } from "@/components/GameResult";
 import { useSession } from "@/lib/session";
 import { recordSession } from "@/games/engine";
@@ -12,11 +13,13 @@ import { colors, radii, space, type } from "@/theme";
 const TOTAL = 5;
 
 export default function NumberCardsScreen() {
+  return <AdaptiveGame gameId="number_cards" render={(lv) => <NumberCardsGame level={lv} />} />;
+}
+
+function NumberCardsGame({ level }: { level: number }) {
   const { t } = useTranslation();
   const router = useRouter();
   const { device, syncNow } = useSession();
-  const params = useLocalSearchParams<{ level?: string }>();
-  const level = Math.min(4, Math.max(1, parseInt(params.level || "2", 10)));
 
   const [round, setRound] = useState<NumberQuestion[]>(() => buildRound(level, TOTAL));
   const [index, setIndex] = useState(0);

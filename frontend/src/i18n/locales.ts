@@ -2,6 +2,42 @@
 
 export const en = {
   appName: "CareCompanion",
+  auth: {
+    title: "Welcome",
+    subtitle: "Sign in or create an account to set up this device.",
+    signIn: "Sign In",
+    signUp: "Sign Up",
+    email: "Email",
+    password: "Password",
+    signInBtn: "Sign in",
+    signUpBtn: "Create account",
+    existing: "You already have an account — please sign in.",
+    invalid: "Email or password is not correct.",
+    needBoth: "Please enter your email and a password (min 4 characters).",
+    working: "Please wait…",
+    offline: "You need internet once to sign in or sign up.",
+  },
+  patientSetup: {
+    title: "Who will use this device?",
+    existingTitle: "Choose a profile",
+    addNew: "Add someone new",
+    continueAs: "Continue as {{name}}",
+    name: "Their name",
+    language: "Preferred language",
+    pin: "Create a 4-digit PIN",
+    enterPin: "Enter the 4-digit PIN for {{name}}",
+    consent: "I confirm I am the authorized family member setting up this profile.",
+    finish: "Finish setup",
+    working: "Setting up…",
+    locating: "We'll save this place as the safe zone.",
+    wrongPin: "That PIN was not correct.",
+    signedInAs: "Signed in as {{email}}",
+  },
+  alarm: {
+    title: "You have left your safe area",
+    body: "Please stay where you are. Your family is being alerted. Tap the button when you are safe.",
+    stop: "I'm safe now",
+  },
   common: {
     yes: "Yes",
     no: "No",
@@ -85,6 +121,7 @@ export const en = {
     tapTarget: "Tap the {{color}} balls",
     hitsGood: "Right taps",
     resultsTitle: "Nicely done",
+    adaptiveNote: "Difficulty adjusts to you automatically.",
   },
   colors: {
     red: "red",
@@ -189,6 +226,7 @@ Object.assign(hi.games, {
   tapPairs: "जोड़ी ढूँढने के लिए दो कार्ड दबाएँ", correct: "शाबाश!",
   tryAgain: "लगभग — सही उत्तर हाइलाइट है।", tapTarget: "{{color}} गेंदों को छुएँ",
   resultsTitle: "बहुत अच्छे",
+  adaptiveNote: "कठिनाई अपने आप आपके अनुसार बदलती है।",
 });
 Object.assign(hi.reminders, {
   title: "आज की गतिविधियाँ", done: "हो गया", skip: "छोड़ें", notNow: "अभी नहीं",
@@ -214,10 +252,52 @@ Object.assign(hi.sos, {
   tellMe: "बताइए क्या हुआ है", recordBtn: "अभी बोलें", recording: "सुन रहा हूँ…",
   send: "परिवार को भेजें", sent: "आपके परिवार को सूचित कर दिया गया है।", safeNow: "मैं अब सुरक्षित हूँ",
 });
+Object.assign(hi.auth, {
+  title: "स्वागत है", subtitle: "इस डिवाइस को सेट अप करने के लिए साइन इन करें या खाता बनाएँ।",
+  signIn: "साइन इन", signUp: "साइन अप", email: "ईमेल", password: "पासवर्ड",
+  signInBtn: "साइन इन करें", signUpBtn: "खाता बनाएँ",
+  existing: "आपका पहले से खाता है — कृपया साइन इन करें।", invalid: "ईमेल या पासवर्ड सही नहीं है।",
+  needBoth: "कृपया ईमेल और पासवर्ड (कम से कम 4 अक्षर) दर्ज करें।", working: "कृपया प्रतीक्षा करें…",
+  offline: "साइन इन/साइन अप के लिए एक बार इंटरनेट चाहिए।",
+});
+Object.assign(hi.patientSetup, {
+  title: "इस डिवाइस का उपयोग कौन करेगा?", existingTitle: "एक प्रोफ़ाइल चुनें", addNew: "नया व्यक्ति जोड़ें",
+  continueAs: "{{name}} के रूप में जारी रखें", name: "उनका नाम", language: "पसंदीदा भाषा",
+  pin: "4-अंकों का पिन बनाएँ", enterPin: "{{name}} का 4-अंकों का पिन दर्ज करें",
+  consent: "मैं पुष्टि करता/करती हूँ कि मैं अधिकृत परिवार सदस्य हूँ।", finish: "सेटअप पूरा करें",
+  working: "सेट अप हो रहा है…", locating: "हम इस जगह को सुरक्षित क्षेत्र के रूप में सहेजेंगे।",
+  wrongPin: "पिन सही नहीं था।", signedInAs: "{{email}} के रूप में साइन इन",
+});
+Object.assign(hi.alarm, {
+  title: "आप अपने सुरक्षित क्षेत्र से बाहर आ गए हैं",
+  body: "कृपया वहीं रुकें। आपके परिवार को सूचित किया जा रहा है। सुरक्षित होने पर बटन दबाएँ।",
+  stop: "मैं अब सुरक्षित हूँ",
+});
 
 // Complete Bengali (bn) — Sarvam supports bn voice end-to-end.
 const bn: any = {
   appName: "কেয়ারকম্প্যানিয়ন",
+  auth: {
+    title: "স্বাগতম", subtitle: "এই ডিভাইস সেট আপ করতে সাইন ইন করুন বা অ্যাকাউন্ট তৈরি করুন।",
+    signIn: "সাইন ইন", signUp: "সাইন আপ", email: "ইমেল", password: "পাসওয়ার্ড",
+    signInBtn: "সাইন ইন করুন", signUpBtn: "অ্যাকাউন্ট তৈরি করুন",
+    existing: "আপনার ইতিমধ্যে অ্যাকাউন্ট আছে — সাইন ইন করুন।", invalid: "ইমেল বা পাসওয়ার্ড সঠিক নয়।",
+    needBoth: "ইমেল ও পাসওয়ার্ড (কমপক্ষে ৪ অক্ষর) দিন।", working: "অপেক্ষা করুন…",
+    offline: "সাইন ইন/আপ করতে একবার ইন্টারনেট দরকার।",
+  },
+  patientSetup: {
+    title: "এই ডিভাইস কে ব্যবহার করবেন?", existingTitle: "একটি প্রোফাইল বেছে নিন", addNew: "নতুন কাউকে যোগ করুন",
+    continueAs: "{{name}} হিসেবে চালিয়ে যান", name: "তাঁর নাম", language: "পছন্দের ভাষা",
+    pin: "৪-সংখ্যার পিন তৈরি করুন", enterPin: "{{name}}-এর ৪-সংখ্যার পিন দিন",
+    consent: "আমি নিশ্চিত করছি যে আমি অনুমোদিত পরিবারের সদস্য।", finish: "সেটআপ শেষ করুন",
+    working: "সেট আপ হচ্ছে…", locating: "আমরা এই স্থানটিকে নিরাপদ এলাকা হিসেবে সংরক্ষণ করব।",
+    wrongPin: "পিন সঠিক নয়।", signedInAs: "{{email}} হিসেবে সাইন ইন",
+  },
+  alarm: {
+    title: "আপনি নিরাপদ এলাকা ছেড়ে গেছেন",
+    body: "যেখানে আছেন সেখানেই থাকুন। আপনার পরিবারকে সতর্ক করা হচ্ছে। নিরাপদ হলে বোতাম চাপুন।",
+    stop: "আমি এখন নিরাপদ",
+  },
   common: { yes: "হ্যাঁ", no: "না", cancel: "বাতিল", back: "পেছনে", close: "বন্ধ", saving: "সংরক্ষণ হচ্ছে…", continue: "এগিয়ে যান", online: "অনলাইন", offline: "অফলাইন" },
   reminderType: { water: "জল", medicine: "ওষুধ", meal: "খাবার", sleep: "ঘুম", exercise: "ব্যায়াম", game: "খেলা" },
   home: {
@@ -243,6 +323,7 @@ const bn: any = {
     whackTheBallDesc: "সঠিক রঙের বল ছুঁয়ে দিন", tapPairs: "জোড়া খুঁজতে দুটি কার্ড চাপুন",
     question: "প্রশ্ন {{n}} / {{total}}", correct: "বাহ!", tryAgain: "প্রায় — সঠিক উত্তর চিহ্নিত।",
     tapTarget: "{{color}} বল ছুঁয়ে দিন", hitsGood: "সঠিক স্পর্শ", resultsTitle: "সুন্দর হয়েছে",
+    adaptiveNote: "কঠিনতা নিজে থেকেই আপনার জন্য সামঞ্জস্য হয়।",
   },
   colors: { red: "লাল", blue: "নীল", green: "সবুজ", yellow: "হলুদ" },
   reminders: {
@@ -277,6 +358,27 @@ const bn: any = {
 // output path falls back to on-device speech; all on-screen text is fully localized.
 const as: any = {
   appName: "কেয়াৰকম্পেনিয়ন",
+  auth: {
+    title: "স্বাগতম", subtitle: "এই ডিভাইচ ছেট আপ কৰিবলৈ ছাইন ইন কৰক বা একাউণ্ট সৃষ্টি কৰক।",
+    signIn: "ছাইন ইন", signUp: "ছাইন আপ", email: "ইমেইল", password: "পাছৱৰ্ড",
+    signInBtn: "ছাইন ইন কৰক", signUpBtn: "একাউণ্ট সৃষ্টি কৰক",
+    existing: "আপোনাৰ ইতিমধ্যে একাউণ্ট আছে — ছাইন ইন কৰক।", invalid: "ইমেইল বা পাছৱৰ্ড শুদ্ধ নহয়।",
+    needBoth: "ইমেইল আৰু পাছৱৰ্ড (কমেও ৪ আখৰ) দিয়ক।", working: "অপেক্ষা কৰক…",
+    offline: "ছাইন ইন/আপ কৰিবলৈ এবাৰ ইণ্টাৰনেট লাগে।",
+  },
+  patientSetup: {
+    title: "এই ডিভাইচ কোনে ব্যৱহাৰ কৰিব?", existingTitle: "এটা প্ৰ'ফাইল বাছক", addNew: "নতুন কাকোবাক যোগ কৰক",
+    continueAs: "{{name}} হিচাপে আগবাঢ়ক", name: "তেওঁৰ নাম", language: "পছন্দৰ ভাষা",
+    pin: "৪-অংকৰ পিন সৃষ্টি কৰক", enterPin: "{{name}}ৰ ৪-অংকৰ পিন দিয়ক",
+    consent: "মই নিশ্চিত কৰোঁ যে মই অনুমোদিত পৰিয়ালৰ সদস্য।", finish: "ছেটআপ সম্পূৰ্ণ কৰক",
+    working: "ছেট আপ হৈছে…", locating: "আমি এই ঠাইখন নিৰাপদ অঞ্চল হিচাপে সাঁচিম।",
+    wrongPin: "পিন শুদ্ধ নহয়।", signedInAs: "{{email}} হিচাপে ছাইন ইন",
+  },
+  alarm: {
+    title: "আপুনি নিৰাপদ অঞ্চল এৰি গৈছে",
+    body: "য'তে আছে তাতে থাকক। আপোনাৰ পৰিয়ালক সতৰ্ক কৰা হৈছে। নিৰাপদ হ'লে বুটাম টিপক।",
+    stop: "মই এতিয়া নিৰাপদ",
+  },
   common: { yes: "হয়", no: "নহয়", cancel: "বাতিল", back: "পিছলৈ", close: "বন্ধ", saving: "সাঁচি থোৱা হৈছে…", continue: "আগবাঢ়ক", online: "অনলাইন", offline: "অফলাইন" },
   reminderType: { water: "পানী", medicine: "ঔষধ", meal: "আহাৰ", sleep: "শোৱা", exercise: "ব্যায়াম", game: "খেল" },
   home: {
@@ -302,6 +404,7 @@ const as: any = {
     whackTheBallDesc: "শুদ্ধ ৰঙৰ বল স্পৰ্শ কৰক", tapPairs: "যোৰা বিচাৰিবলৈ দুখন কাৰ্ড টিপক",
     question: "প্ৰশ্ন {{n}} / {{total}}", correct: "সাব্বাস!", tryAgain: "প্ৰায় — শুদ্ধ উত্তৰ চিহ্নিত।",
     tapTarget: "{{color}} বল স্পৰ্শ কৰক", hitsGood: "শুদ্ধ স্পৰ্শ", resultsTitle: "ধুনীয়া হ'ল",
+    adaptiveNote: "কঠিনতা নিজে নিজেই আপোনাৰ বাবে সালসলনি হয়।",
   },
   colors: { red: "ৰঙা", blue: "নীলা", green: "সেউজীয়া", yellow: "হালধীয়া" },
   reminders: {
@@ -337,6 +440,11 @@ const as: any = {
 // Sarvam TTS does not support Manipuri, so voice output uses on-device speech fallback.
 const mni: any = {
   appName: "ꯀꯦꯌꯔꯀꯝꯄꯦꯅꯤꯌꯟ",
+  alarm: {
+    title: "ꯑꯗꯣꯝ ꯅꯤꯡꯊꯤꯖꯕ ꯃꯐꯝ ꯊꯣꯛꯈ꯭ꯔꯦ",
+    body: "ꯃꯐꯝ ꯑꯗꯨꯗ ꯂꯦꯞꯄꯤꯌꯨ꯫ ꯑꯗꯣꯝꯒꯤ ꯏꯃꯨꯡꯗ ꯈꯪꯍꯜꯂꯤ꯫",
+    stop: "ꯑꯩ ꯍꯧꯖꯤꯛ ꯅꯤꯡꯊꯤꯖꯔꯦ",
+  },
   common: { yes: "ꯍꯣꯏ", no: "ꯅꯠꯇꯦ", cancel: "ꯀꯛꯊꯠ", back: "ꯍꯟꯗꯣꯛ", close: "ꯂꯣꯟꯁꯤꯅꯕ", online: "ꯑꯟꯂꯥꯏꯟ", offline: "ꯑꯐꯂꯥꯏꯟ" },
   reminderType: { water: "ꯏꯁꯤꯡ", medicine: "ꯍꯤꯗꯥꯛ", meal: "ꯆꯥꯛ", sleep: "ꯇꯨꯝꯕ", exercise: "ꯑꯀꯨꯞꯄ", game: "ꯁꯥꯅꯅꯕ" },
   home: {

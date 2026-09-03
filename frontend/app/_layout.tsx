@@ -4,6 +4,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "@/i18n";
 import { SessionProvider } from "@/lib/session";
+import { AlarmOverlay } from "@/components/AlarmOverlay";
 import { colors } from "@/theme";
 
 export default function RootLayout() {
@@ -19,6 +20,7 @@ export default function RootLayout() {
               animation: "fade",
             }}
           />
+          <AlarmOverlay />
         </SessionProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

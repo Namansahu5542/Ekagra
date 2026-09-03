@@ -263,6 +263,22 @@ def profile_public(profile: dict) -> dict:
     return p
 
 
+@app.get("/api/v1/patient-profile/mine")
+async def my_patients(caregiver_id: str = Depends(sec.get_current_caregiver)):
+    db = dbmod.get_db()
+    patients = []
+    async for link in db.caregiver_links.find({"caregiver_id": caregiver_id}):
+        profile = await db.patient_profiles.find_one({"patient_id": link["patient_id"]})
+        if profile:
+            patients.append({
+                "patient_id": profile["patient_id"],
+                "name": profile.get("name"),
+                "preferred_language": profile.get("preferred_language", "en"),
+                "access_level": link.get("access_level", "primary"),
+            })
+    return {"patients": patients}
+
+
 @app.get("/api/v1/patient-profile/{patient_id}/as-caregiver")
 async def get_profile_caregiver(patient_id: str, caregiver_id: str = Depends(sec.get_current_caregiver)):
     await require_link(caregiver_id, patient_id)

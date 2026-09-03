@@ -21,14 +21,19 @@ type Device = {
   pinHash: string;
 };
 
+type Caregiver = { email: string; userId: string; token: string } | null;
+
 type Ctx = {
   ready: boolean;
   device: Device | null;
+  caregiver: Caregiver;
   unlocked: boolean;
   online: boolean;
   language: string;
   pending: number;
   lastSynced: string | null;
+  alarmActive: boolean;
+  setCaregiver: (c: Caregiver) => Promise<void>;
   completeSetup: (d: {
     patientId: string;
     profile: any;
@@ -38,6 +43,8 @@ type Ctx = {
   tryUnlock: (pin: string) => boolean;
   lock: () => void;
   reset: () => Promise<void>;
+  signOut: () => Promise<void>;
+  dismissAlarm: () => void;
   setLanguage: (lng: string) => Promise<void>;
   syncNow: () => Promise<number>;
   refreshPending: () => Promise<void>;
@@ -49,11 +56,13 @@ export const useSession = () => useContext(SessionContext);
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
   const [device, setDevice] = useState<Device | null>(null);
+  const [caregiver, setCaregiverState] = useState<Caregiver>(null);
   const [unlocked, setUnlocked] = useState(false);
   const [online, setOnline] = useState(true);
   const [language, setLang] = useState("en");
   const [pending, setPending] = useState(0);
   const [lastSynced, setLastSynced] = useState<string | null>(null);
+  const [alarmActive, setAlarmActive] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -65,6 +74,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         setLang(lng);
         i18n.changeLanguage(lng);
       }
+      const cg = await store.kvGet("caregiver");
+      if (cg) setCaregiverState(JSON.parse(cg));
       setLastSynced(await store.kvGet("lastSynced"));
       setPending(await pendingCount());
       setReady(true);
@@ -141,8 +152,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       if (cancelled || !point || !device) return;
       await recordPing(device.patientId, point);
       lastPoint = point;
-      if (isOutsideSafeZone(device.profile?.safe_zone, point) && online) {
-        await reportBreach(device.token, device.patientId, point);
+      if (isOutsideSafeZone(device.profile?.safe_zone, point)) {
+        setAlarmActive(true);
+        if (online) await reportBreach(device.token, device.patientId, point);
       }
     }
     tick();
@@ -183,10 +195,28 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const lock = useCallback(() => setUnlocked(false), []);
 
+  const setCaregiver = useCallback(async (c: Caregiver) => {
+    setCaregiverState(c);
+    if (c) await store.kvSet("caregiver", JSON.stringify(c));
+    else await store.kvDel("caregiver");
+  }, []);
+
+  const dismissAlarm = useCallback(() => setAlarmActive(false), []);
+
   const reset = useCallback(async () => {
     await store.kvDel("device");
     setDevice(null);
     setUnlocked(false);
+    setAlarmActive(false);
+  }, []);
+
+  const signOut = useCallback(async () => {
+    await store.kvDel("device");
+    await store.kvDel("caregiver");
+    setDevice(null);
+    setCaregiverState(null);
+    setUnlocked(false);
+    setAlarmActive(false);
   }, []);
 
   const setLanguage = useCallback(
@@ -209,20 +239,25 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     () => ({
       ready,
       device,
+      caregiver,
       unlocked,
       online,
       language,
       pending,
       lastSynced,
+      alarmActive,
+      setCaregiver,
       completeSetup,
       tryUnlock,
       lock,
       reset,
+      signOut,
+      dismissAlarm,
       setLanguage,
       syncNow,
       refreshPending,
     }),
-    [ready, device, unlocked, online, language, pending, lastSynced, completeSetup, tryUnlock, lock, reset, setLanguage, syncNow, refreshPending]
+    [ready, device, caregiver, unlocked, online, language, pending, lastSynced, alarmActive, setCaregiver, completeSetup, tryUnlock, lock, reset, signOut, dismissAlarm, setLanguage, syncNow, refreshPending]
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

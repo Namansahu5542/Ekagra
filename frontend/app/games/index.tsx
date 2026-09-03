@@ -15,27 +15,15 @@ const GAMES = [
 export default function GamesHub() {
   const { t } = useTranslation();
   const router = useRouter();
-  const [level, setLevel] = useState(2);
 
   return (
     <Screen testID="games-screen" showSos>
       <Header title={t("games.title")} />
       <AppText size={type.body} color={colors.pewter}>{t("games.subtitle")}</AppText>
 
-      <Card>
-        <AppText size={type.helper} weight="700">{t("games.level")}</AppText>
-        <View style={styles.levels}>
-          {[1, 2, 3, 4].map((l) => (
-            <Pressable
-              key={l}
-              testID={`level-${l}`}
-              onPress={() => setLevel(l)}
-              style={[styles.level, level === l && styles.levelOn]}
-            >
-              <AppText size={type.heading} weight="700" color={level === l ? colors.pureWhite : colors.inkBlack}>{l}</AppText>
-            </Pressable>
-          ))}
-        </View>
+      <Card style={{ flexDirection: "row", alignItems: "center", gap: space.sm, backgroundColor: colors.successBg, borderColor: colors.successBg }}>
+        <Ionicons name="sparkles" size={22} color={colors.success} />
+        <AppText size={type.helper} weight="600" color={colors.success} style={{ flex: 1 }}>{t("games.adaptiveNote")}</AppText>
       </Card>
 
       {GAMES.map((g) => (
@@ -53,7 +41,7 @@ export default function GamesHub() {
             testID={`start-${g.id}`}
             label={t("games.start")}
             icon="play"
-            onPress={() => router.push(`/games/${g.id}?level=${level}`)}
+            onPress={() => router.push(`/games/${g.id}`)}
           />
         </Card>
       ))}

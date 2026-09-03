@@ -1,9 +1,10 @@
 import { useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { AppText, BigButton, Header, Screen } from "@/components/UI";
+import { AdaptiveGame } from "@/components/AdaptiveGame";
 import { GameResult } from "@/components/GameResult";
 import { useSession } from "@/lib/session";
 import { recordSession } from "@/games/engine";
@@ -17,11 +18,13 @@ import {
 import { colors, radii, space, type } from "@/theme";
 
 export default function FlipCardsScreen() {
+  return <AdaptiveGame gameId="flip_cards" render={(lv) => <FlipCardsGame level={lv} />} />;
+}
+
+function FlipCardsGame({ level }: { level: number }) {
   const { t } = useTranslation();
   const router = useRouter();
   const { device, syncNow } = useSession();
-  const params = useLocalSearchParams<{ level?: string }>();
-  const level = Math.min(4, Math.max(1, parseInt(params.level || "2", 10)));
   const pairs = pairsForLevel(level);
   const cols = columnsForLevel(level);
 

@@ -1,4 +1,5 @@
 import os
+import certifi
 from motor.motor_asyncio import AsyncIOMotorClient
 
 _client: AsyncIOMotorClient | None = None
@@ -7,7 +8,11 @@ _client: AsyncIOMotorClient | None = None
 def get_client() -> AsyncIOMotorClient:
     global _client
     if _client is None:
-        _client = AsyncIOMotorClient(os.environ["MONGO_URL"])
+        uri = os.environ["MONGO_URL"]
+        kwargs = {}
+        if uri.startswith("mongodb+srv") or "mongodb.net" in uri:
+            kwargs["tlsCAFile"] = certifi.where()
+        _client = AsyncIOMotorClient(uri, **kwargs)
     return _client
 
 
