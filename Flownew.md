@@ -8,12 +8,14 @@
 ```
 1. Caregiver downloads app
    → "Setting up for yourself or a family member?" → selects "Family member"
+   
 
 2. Caregiver Signup
    → Email/phone + password or OTP → Account created
 
 3. Guided Patient Profile Setup Wizard
    → Patient name, photo
+   
    → Preferred language (Assamese / Meitei / Hindi / Bengali / English)
    → Set patient PIN (for unlocking patient mode on their device)
    → Add daily reminders for water, medicine, meals, sleep, exercise, and games
