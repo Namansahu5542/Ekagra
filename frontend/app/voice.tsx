@@ -84,7 +84,7 @@ export default function Voice() {
   }
 
   return (
-    <Screen testID="voice-screen">
+    <Screen testID="voice-screen" showSos>
       <Header title={t("voice.title")} />
 
       <Card style={{ alignItems: "center", gap: space.md, paddingVertical: space.xl }}>

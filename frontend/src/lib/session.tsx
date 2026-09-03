@@ -12,6 +12,7 @@ import { store } from "@/lib/storage";
 import { api } from "@/lib/api";
 import { pinHash } from "@/lib/ids";
 import { pushAll, pendingCount } from "@/lib/sync";
+import { getPosition, recordPing, isOutsideSafeZone, reportBreach, flushSos } from "@/lib/safety";
 
 type Device = {
   patientId: string;
@@ -113,6 +114,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       const { pushed } = await pushAll(device.token);
+      await flushSos(device.token);
       const ts = new Date().toISOString();
       await store.kvSet("lastSynced", ts);
       setLastSynced(ts);
@@ -128,6 +130,29 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (online && unlocked && device?.token) syncNow();
   }, [online, unlocked, device?.token]);
+
+  // Foreground location tracking + safe-zone geofence (adaptive interval).
+  useEffect(() => {
+    if (!unlocked || !device) return;
+    let cancelled = false;
+    let lastPoint: { lat: number; long: number } | null = null;
+    async function tick() {
+      const point = await getPosition();
+      if (cancelled || !point || !device) return;
+      await recordPing(device.patientId, point);
+      lastPoint = point;
+      if (isOutsideSafeZone(device.profile?.safe_zone, point) && online) {
+        await reportBreach(device.token, device.patientId, point);
+      }
+    }
+    tick();
+    // Poll every 20s when moving stays responsive; battery-friendly cadence.
+    const id = setInterval(tick, 20000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [unlocked, device, online]);
 
   const completeSetup: Ctx["completeSetup"] = useCallback(async (d) => {
     const dev: Device = {

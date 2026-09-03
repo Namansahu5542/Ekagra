@@ -18,7 +18,7 @@ export default function GamesHub() {
   const [level, setLevel] = useState(2);
 
   return (
-    <Screen testID="games-screen">
+    <Screen testID="games-screen" showSos>
       <Header title={t("games.title")} />
       <AppText size={type.body} color={colors.pewter}>{t("games.subtitle")}</AppText>
 

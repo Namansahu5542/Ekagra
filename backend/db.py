@@ -27,3 +27,6 @@ async def ensure_indexes():
     await db.sticky_notes.create_index("note_id", unique=True)
     await db.reminder_logs.create_index("log_id", unique=True)
     await db.location_pings.create_index("ping_id", unique=True)
+    await db.sos_alerts.create_index("sos_alert_id", unique=True)
+    await db.alerts_feed.create_index("alert_id", unique=True)
+    await db.alerts_feed.create_index([("patient_id", 1), ("created_at", -1)])

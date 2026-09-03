@@ -33,11 +33,14 @@ export function Screen({
   children,
   scroll = true,
   testID,
+  showSos = false,
 }: {
   children: React.ReactNode;
   scroll?: boolean;
   testID?: string;
+  showSos?: boolean;
 }) {
+  const router = useRouter();
   const body = (
     <View style={styles.screenInner} testID={testID}>
       {children}
@@ -52,6 +55,16 @@ export function Screen({
       ) : (
         body
       )}
+      {showSos ? (
+        <Pressable
+          testID="sos-fab"
+          onPress={() => router.push("/sos")}
+          style={({ pressed }) => [styles.sosFab, pressed && { opacity: 0.88 }]}
+        >
+          <Ionicons name="warning" size={26} color={colors.pureWhite} />
+          <AppText size={type.action} weight="700" color={colors.pureWhite}>SOS</AppText>
+        </Pressable>
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -247,4 +260,21 @@ const styles = StyleSheet.create({
     borderRadius: radii.badge,
   },
   dot: { width: 10, height: 10, borderRadius: 5 },
+  sosFab: {
+    position: "absolute",
+    right: space.lg,
+    bottom: space.lg,
+    backgroundColor: colors.danger,
+    borderRadius: 32,
+    minHeight: 60,
+    paddingHorizontal: space.lg,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    shadowColor: colors.inkBlack,
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 6,
+  },
 });

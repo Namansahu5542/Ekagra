@@ -44,7 +44,7 @@ export default function Reminders() {
   }
 
   return (
-    <Screen testID="reminders-screen">
+    <Screen testID="reminders-screen" showSos>
       <Header title={t("reminders.title")} />
       <Card style={{ backgroundColor: colors.peachBlush, borderColor: colors.peachBlush }}>
         <AppText size={type.helper}>{t("reminders.medicineNote")}</AppText>

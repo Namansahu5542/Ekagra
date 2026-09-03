@@ -67,6 +67,24 @@ export const api = {
       headers: { "X-Patient-PIN-Token": patientToken },
       body: JSON.stringify({ text, target_language: targetLanguage }),
     }),
+  sosTrigger: (patientToken: string, payload: any) =>
+    request("/sos/trigger", {
+      method: "POST",
+      headers: { "X-Patient-PIN-Token": patientToken },
+      body: JSON.stringify(payload),
+    }),
+  sosDetail: (patientToken: string, sosAlertId: string, payload: any) =>
+    request(`/sos/${sosAlertId}/detail`, {
+      method: "PATCH",
+      headers: { "X-Patient-PIN-Token": patientToken },
+      body: JSON.stringify(payload),
+    }),
+  geofenceBreach: (patientToken: string, payload: any) =>
+    request("/alerts/geofence", {
+      method: "POST",
+      headers: { "X-Patient-PIN-Token": patientToken },
+      body: JSON.stringify(payload),
+    }),
   health: () => request("/health"),
 };
 

@@ -30,7 +30,7 @@ export default function Home() {
   const clock = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
   return (
-    <Screen testID="home-screen">
+    <Screen testID="home-screen" showSos>
       <View style={styles.topRow}>
         <View style={{ flex: 1 }}>
           <AppText size={type.title} weight="700">{t("home.greeting", { name })}</AppText>

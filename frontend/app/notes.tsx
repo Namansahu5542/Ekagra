@@ -42,7 +42,7 @@ export default function Notes() {
   }
 
   return (
-    <Screen testID="notes-screen">
+    <Screen testID="notes-screen" showSos>
       <Header title={t("notes.title")} />
       <Card>
         <TextInput

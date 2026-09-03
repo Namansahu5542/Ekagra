@@ -47,6 +47,20 @@ sticky_notes, reminder_logs, location_pings, invite_codes.
 
 ## Backlog / Next (priority order)
 - P1: Iteration 4 Adaptive Game Coach (deterministic level recommendation).
-- P1: Iteration 6 Caregiver web dashboard (scores/reminders/alerts).
-- P2: Iteration 7 SOS + geofencing (expo-location, notification-provider interface).
-- P2: Iteration 8 full localization QA for bn/as/mni; reviewed safety copy.
+- P1: Iteration 6 Caregiver web dashboard (scores/reminders/alerts + live SOS socket already available at /api/v1/ws/caregiver/{id}).
+- P2: Server-side geofence dedup/rate-limit; SOS resolve state machine; persist PIN lockout (currently in-process).
+- P2: Native-speaker review of Manipuri (mni) translations; complete remaining mni keys.
+
+## Implemented — Iteration 7 & 8 (2026-09-03)
+- SAFETY (Iter 7): Two-stage SOS — persistent SOS button (Screen `showSos` FAB) on all patient
+  screens; `app/sos.tsx` 3s countdown+cancel → Stage 1 `POST /sos/trigger` (client UUID,
+  idempotent, <2s) → Stage 2 voice/text `PATCH /sos/{id}/detail` updating the SAME record.
+  `PATCH /sos/{id}/resolve` (caregiver, link-checked). Live foreground location tracking +
+  safe-zone geofencing (`src/lib/safety.ts`), breach → `POST /alerts/geofence`. Alerts land in
+  `alerts_feed`; delivery via `NotificationProvider` interface (WebSocketProvider active; FCM/SMS
+  deferred behind the interface). `GET /dashboard/alerts|location/{id}` (linked caregiver only).
+  Offline SOS queued in a local outbox and flushed on reconnect. Verified: backend 26/26,
+  frontend flows all pass.
+- LOCALIZATION (Iter 8): Full Bengali + Assamese dictionaries; Manipuri/Meitei core+safety
+  (MACHINE, pending native review). `TRANSLATION_META` tracks version/reviewer. Assamese &
+  Manipuri TTS fall back to on-device speech (Sarvam TTS unsupported for as/mni).

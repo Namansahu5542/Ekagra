@@ -5,11 +5,12 @@ from typing import Literal, Optional
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr, Field
 
 import db as dbmod
+import notifications as notif
 import sarvam
 import security as sec
 
@@ -395,3 +396,164 @@ async def voice_asr(body: VoiceAsr, patient_id: str = Depends(sec.get_patient_se
 @app.post("/api/v1/voice/tts")
 async def voice_tts(body: VoiceTts, patient_id: str = Depends(sec.get_patient_session)):
     return await sarvam.synthesize(body.text, body.target_language)
+
+
+
+# ------------------------- SOS (Two-Stage) -------------------------
+class LatLong(BaseModel):
+    lat: float
+    long: float
+
+
+class SosTrigger(BaseModel):
+    sos_alert_id: str
+    patient_id: str
+    triggered_at: str
+    location: Optional[LatLong] = None
+
+
+class SosDetail(BaseModel):
+    transcribed_text: Optional[str] = None
+    raw_audio_url: Optional[str] = None
+
+
+class SosResolve(BaseModel):
+    status: Literal["acknowledged", "resolved"]
+
+
+class GeofenceEvent(BaseModel):
+    patient_id: str
+    location: LatLong
+    recorded_at: str
+
+
+async def _add_alert(patient_id: str, atype: str, message: str) -> dict:
+    alert = {
+        "alert_id": new_id(),
+        "patient_id": patient_id,
+        "type": atype,
+        "message": message,
+        "created_at": now_iso(),
+        "read": False,
+    }
+    await dbmod.get_db().alerts_feed.insert_one(alert)
+    return clean(alert)
+
+
+@app.post("/api/v1/sos/trigger")
+async def sos_trigger(body: SosTrigger, patient_id: str = Depends(sec.get_patient_session)):
+    if body.patient_id != patient_id:
+        raise HTTPException(403, "Patient token mismatch")
+    db = dbmod.get_db()
+    record = {
+        "sos_alert_id": body.sos_alert_id,
+        "patient_id": patient_id,
+        "triggered_at": body.triggered_at,
+        "location": body.location.model_dump() if body.location else None,
+        "status": "triggered",
+        "transcribed_text": None,
+        "raw_audio_url": None,
+        "detail_received_at": None,
+        "acknowledged_by": None,
+        "resolved_at": None,
+    }
+    # Idempotent create (safe to retry from offline queue).
+    result = await db.sos_alerts.update_one(
+        {"sos_alert_id": body.sos_alert_id}, {"$setOnInsert": record}, upsert=True
+    )
+    if result.upserted_id is not None:
+        alert = await _add_alert(patient_id, "sos", "SOS triggered by patient")
+        await notif.provider.notify_caregivers(
+            patient_id,
+            {"kind": "sos", "sos_alert_id": body.sos_alert_id, "status": "triggered",
+             "location": record["location"], "triggered_at": body.triggered_at, "alert": alert},
+        )
+    return {"sos_alert_id": body.sos_alert_id, "status": "triggered"}
+
+
+@app.patch("/api/v1/sos/{sos_alert_id}/detail")
+async def sos_detail(sos_alert_id: str, body: SosDetail, patient_id: str = Depends(sec.get_patient_session)):
+    db = dbmod.get_db()
+    existing = await db.sos_alerts.find_one({"sos_alert_id": sos_alert_id, "patient_id": patient_id})
+    if not existing:
+        raise HTTPException(404, "SOS alert not found")
+    await db.sos_alerts.update_one(
+        {"sos_alert_id": sos_alert_id},
+        {"$set": {
+            "transcribed_text": body.transcribed_text,
+            "raw_audio_url": body.raw_audio_url,
+            "detail_received_at": now_iso(),
+        }},
+    )
+    await notif.provider.notify_caregivers(
+        patient_id,
+        {"kind": "sos_detail", "sos_alert_id": sos_alert_id, "transcribed_text": body.transcribed_text},
+    )
+    return {"updated": True}
+
+
+@app.patch("/api/v1/sos/{sos_alert_id}/resolve")
+async def sos_resolve(sos_alert_id: str, body: SosResolve, caregiver_id: str = Depends(sec.get_current_caregiver)):
+    db = dbmod.get_db()
+    sos = await db.sos_alerts.find_one({"sos_alert_id": sos_alert_id})
+    if not sos:
+        raise HTTPException(404, "SOS alert not found")
+    await require_link(caregiver_id, sos["patient_id"])
+    updates: dict = {"status": body.status, "acknowledged_by": caregiver_id}
+    if body.status == "resolved":
+        updates["resolved_at"] = now_iso()
+    await db.sos_alerts.update_one({"sos_alert_id": sos_alert_id}, {"$set": updates})
+    return {"updated": True}
+
+
+@app.get("/api/v1/sos/active")
+async def sos_active(patient_id: str, session_patient: str = Depends(sec.get_patient_session)):
+    if session_patient != patient_id:
+        raise HTTPException(403, "Patient token mismatch")
+    db = dbmod.get_db()
+    rows = db.sos_alerts.find({"patient_id": patient_id, "status": {"$ne": "resolved"}})
+    return {"active": [clean(r) async for r in rows]}
+
+
+# ------------------------- Geofence & Alerts -------------------------
+@app.post("/api/v1/alerts/geofence")
+async def geofence_breach(body: GeofenceEvent, patient_id: str = Depends(sec.get_patient_session)):
+    if body.patient_id != patient_id:
+        raise HTTPException(403, "Patient token mismatch")
+    alert = await _add_alert(patient_id, "geofence_exit", "Patient has left the safe zone")
+    await notif.provider.notify_caregivers(
+        patient_id,
+        {"kind": "geofence_exit", "location": body.location.model_dump(),
+         "recorded_at": body.recorded_at, "alert": alert},
+    )
+    return {"alert_id": alert["alert_id"], "type": "geofence_exit"}
+
+
+@app.get("/api/v1/dashboard/alerts/{patient_id}")
+async def dashboard_alerts(patient_id: str, caregiver_id: str = Depends(sec.get_current_caregiver)):
+    await require_link(caregiver_id, patient_id)
+    db = dbmod.get_db()
+    rows = db.alerts_feed.find({"patient_id": patient_id}).sort("created_at", -1).limit(50)
+    return {"alerts": [clean(r) async for r in rows]}
+
+
+@app.get("/api/v1/dashboard/location/{patient_id}")
+async def dashboard_location(patient_id: str, caregiver_id: str = Depends(sec.get_current_caregiver)):
+    await require_link(caregiver_id, patient_id)
+    db = dbmod.get_db()
+    rows = await db.location_pings.find({"patient_id": patient_id}).sort("recorded_at", -1).limit(200).to_list(200)
+    trail = [clean(r) for r in rows]
+    return {"current": trail[0] if trail else None, "trail": trail}
+
+
+# ------------------------- Caregiver dashboard live socket -------------------------
+@app.websocket("/api/v1/ws/caregiver/{caregiver_id}")
+async def caregiver_ws(websocket: WebSocket, caregiver_id: str):
+    await notif.manager.connect(caregiver_id, websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        notif.manager.disconnect(caregiver_id, websocket)
+    except Exception:
+        notif.manager.disconnect(caregiver_id, websocket)
