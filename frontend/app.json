@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "CareCompanion",
+    "slug": "carecompanion",
+    "scheme": "carecompanion",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-localization",
+      [
+        "expo-audio",
+        { "microphonePermission": "Allow CareCompanion to use the microphone for voice help and SOS." }
+      ],
+      [
+        "expo-location",
+        { "locationWhenInUsePermission": "Allow CareCompanion to share your location with your family for safety." }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
