@@ -87,9 +87,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     try {
       const controller = new AbortController();
       const t = setTimeout(() => controller.abort(), 4000);
-      await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/health`, {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/v1/health`, {
         signal: controller.signal,
       });
+      if (!response.ok) throw new Error(`Backend health check failed (${response.status})`);
       clearTimeout(t);
       setOnline(true);
     } catch {
