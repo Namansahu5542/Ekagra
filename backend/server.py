@@ -7,6 +7,7 @@ load_dotenv()
 
 from fastapi import Depends, FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, EmailStr, Field
 
 import db as dbmod
@@ -573,3 +574,10 @@ async def caregiver_ws(websocket: WebSocket, caregiver_id: str):
         notif.manager.disconnect(caregiver_id, websocket)
     except Exception:
         notif.manager.disconnect(caregiver_id, websocket)
+
+
+# Docker copies the exported Expo web application to ./web.  Mounting it after
+# API routes keeps /api/v1/* and the WebSocket endpoint available to the client.
+import os
+if os.path.isdir("web"):
+    app.mount("/", StaticFiles(directory="web", html=True), name="web")
