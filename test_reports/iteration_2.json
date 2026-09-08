@@ -1,0 +1,27 @@
+{
+  "summary": "Iteration 7 & 8 verification (Safety two-stage SOS, geofence, dashboard reads, and bn/as localization). Backend: 26/26 pytest passed (11 new tests added covering SOS trigger idempotency+dedup, SOS detail same-record update, SOS unknown id 404, SOS resolve 401/403/link-required, geofence 200/403, dashboard/alerts and dashboard/location 401/403 + linked-caregiver access, patient mismatch 403). Frontend: SOS FAB visible on home; 3s countdown works; sos-cancel returns without triggering; stage1 message shown after countdown; sos-detail-input + sos-send-detail transitions to sos-sent; cc:kv:sos_outbox is empty/null after online send (confirming trigger + detail both reached backend). Settings simulate-breach shows breach-msg with ✓ (backend geofence_exit alert created). Bengali labels (সেটিংস / ভাষা / নিরাপত্তা) and Assamese labels (ছেটিংছ / সুৰক্ষা) render on Settings. All 15 regression backend tests (auth, profile, PIN lockout, sync push/pull idempotency, voice validation) still green.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "SOS FAB (Screen showSos) is not rendered on /settings — spec says 'from any patient screen a persistent SOS button is visible'. Settings is patient-visible (accessible from home). Consider enabling showSos on settings for full coverage, or explicitly document that SOS is only on core patient screens.",
+    "sos.tsx: cancellation flag `cancelledRef` is only checked inside fireStage1, but the countdown effect also races the setTimeout — after cancel we call router.back() but the pending setTimeout may still tick once (harmless because phase check bails). Consider clearing the timer on cancel by also flipping phase to 'done' or by returning early.",
+    "reportBreach dedup uses localStorage 'geofence_last_breach' with a 60s window — this is client-side only. Backend does not dedup identical geofence events; a compromised/buggy client could flood /api/v1/alerts/geofence. Consider server-side rate limit / dedup per patient.",
+    "SOS resolve endpoint accepts status only ('acknowledged'|'resolved') but does not enforce state machine (e.g., resolving without first acknowledging is allowed). Minor: could add ordering check.",
+    "PIN lockout counter still in-process (security.py _attempts dict) — previously flagged; still not persisted."
+  ],
+  "updated_files": [
+    "/app/backend/tests/backend_test.py"
+  ],
+  "success_rate": {"backend": "100% (26/26)", "frontend": "100% (all critical flows passed)"},
+  "test_credentials": "Fresh caregiver per test run (t_<rand>@example.com / secret1), PIN 1234. Existing caregiver@example.com/secret1 also present.",
+  "seed_data_creation": "Fresh caregiver + patient per pytest session; frontend test clears localStorage and performs fresh device setup each run.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend routes under /api/v1. Patient session header X-Patient-PIN-Token; caregiver Authorization: Bearer. SOS trigger is idempotent on sos_alert_id (verify by dashboard/alerts count delta = 1 across duplicate posts). Dashboard alerts/location require caregiver linked via caregiver_links collection (created automatically at patient-profile/create). Frontend is Expo web — use domcontentloaded + explicit selector waits; localStorage is empty on each new browser context (starts on setup-screen). The SOS FAB is present on home/games/reminders/notes/voice screens; it is NOT present on /settings (used direct nav for settings tests). Bengali strings on Settings: 'সেটিংস'/'ভাষা'/'নিরাপত্তা'. Assamese: 'ছেটিংছ'/'সুৰক্ষা'.",
+  "rca of the issue": "N/A — no failing tests."
+}

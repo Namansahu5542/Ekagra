@@ -1,0 +1,10 @@
+.git
+.idea
+.emergent
+**/node_modules
+**/.expo
+**/dist
+**/__pycache__
+**/*.pyc
+**/.env
+*.log
