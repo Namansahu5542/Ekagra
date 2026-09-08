@@ -6,10 +6,12 @@ import { useTranslation } from "react-i18next";
 import { AppText, BigButton, Card, Header, Screen } from "@/components/UI";
 import { colors, radii, space, touch, type } from "@/theme";
 
+// Each activity gets its own gentle, distinguishable wash so people can
+// recognise it by colour as well as by name and icon.
 const GAMES = [
-  { id: "flip-cards", icon: "grid" as const, key: "flipCards", bg: colors.peachBlush },
-  { id: "number-cards", icon: "calculator" as const, key: "numberCards", bg: colors.sand },
-  { id: "whack-the-ball", icon: "ellipse" as const, key: "whackTheBall", bg: colors.fog },
+  { id: "flip-cards", icon: "grid" as const, key: "flipCards", bg: colors.surfaceLavender },
+  { id: "number-cards", icon: "calculator" as const, key: "numberCards", bg: colors.surfaceWarm },
+  { id: "whack-the-ball", icon: "ellipse" as const, key: "whackTheBall", bg: colors.successBg },
 ];
 
 export default function GamesHub() {
